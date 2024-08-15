@@ -1,21 +1,22 @@
+import axios from "axios";
 import logo from "../img/school_logo.svg";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  var id = [
-    {
-      username: "Nandha",
-      password: "1234",
-    },
-    {
-      username: "admin",
-      password: "123456",
-    },
-  ];
+  const [id, setId] = useState([]);
+
+  axios
+      .get("http://localhost:5000/")
+      .then((data) => setId(data.data))
+      .catch(() => console.log("Error"));
+
+  const navigate = useNavigate();
 
   const [typedUsername, setTypedUsername] = useState("");
   const [typedPassword, setTypedPassword] = useState("");
   const [nid, setNid] = useState(false);
+  const [nid2, set2Nid] = useState(true);
 
   const handleUsername = (evt) => {
     setTypedUsername(evt.target.value);
@@ -26,15 +27,23 @@ const Login = () => {
   };
 
   function checkIdPassword() {
-    id.forEach((items) => {
+
+    id.forEach((items, index) => {
       if (
-        items.username === typedUsername &&
-        items.password === typedPassword
+        items.id[index].username === typedUsername &&
+        items.id[index].password === typedPassword
       ) {
+        navigate("/dashboard", { state: { user: typedUsername } });
         setNid(true);
       }
-    })
-    
+    });
+
+    if (nid === true) {
+      set2Nid(true);
+      navigate("/dashboard", { state: { user: typedUsername } });
+    } else {
+      set2Nid(false);
+    }
   }
 
   return (
@@ -48,6 +57,14 @@ const Login = () => {
             className="rounded-md"
           />
         </div>
+
+        {nid2 ? (
+          <></>
+        ) : (
+          <h1 className="text-red-600 font-bold">
+            Enter Correct Username / Password
+          </h1>
+        )}
 
         <section className="p-4">
           <p className="font-semibold">Username</p>
